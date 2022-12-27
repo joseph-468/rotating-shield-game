@@ -1,7 +1,10 @@
 import pygame
 import random
 
-FPS = 240  # Max is 240, Min is 30, Recommended is 240
+# Options
+with open("options.txt", "r") as config:
+    options = config.readlines()
+    FPS = int("".join(i for i in options[1] if i in "1234567890"))
 
 
 def main():

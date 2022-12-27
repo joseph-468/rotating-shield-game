@@ -1,0 +1,2 @@
+# FPS is reccomended to be 240 but can be lowered to 120, 60 or 30 if need be
+FPS=240

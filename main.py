@@ -1,7 +1,7 @@
 import pygame
 import random
 
-FPS = 120  # Max is 240, Min is 20
+FPS = 240  # Max is 240, Min is 30, Recommended is 240
 
 
 def main():
@@ -14,12 +14,13 @@ def main():
     clock = pygame.time.Clock()
 
     # Variables
-    ten_second = FPS * 10
+    waiting = False
+    fifteen_seconds = FPS * 15
     frame_interval = 240 // FPS
-    delay_interval = FPS / 60
+    delay = FPS
+    max_speed = frame_interval*4
     game_over = False
-    bullet_speed = 4
-    spawn_locations = [(0, 395), (395, 0), (395, 792), (792, 395)]
+    spawn_locations = [(-8, 395), (395, -8), (395, 800), (800, 395)]
     delay_counter = 0
     counter = 0
     score = 0
@@ -45,9 +46,11 @@ def main():
                 pygame.quit()
                 exit()
 
-    def adjust_difficulty():
-        frame_delay = FPS - counter // FPS * delay_interval
-        pixel_per_frame = frame_interval + counter // ten_second
+    def adjust_difficulty(new_delay):
+        frame_delay = new_delay - (new_delay*frame_interval/8000)
+        pixel_per_frame = frame_interval + counter // fifteen_seconds * frame_interval
+        if pixel_per_frame > max_speed:
+            pixel_per_frame = max_speed
         return frame_delay, pixel_per_frame
 
     def handle_turning(key):
@@ -69,7 +72,13 @@ def main():
             player.y = 383
 
     def move_bullets():
-        for bullet in bullets:
+        speeds = set(bullet.speed for bullet in bullets)
+        wait = False
+        for x, bullet in enumerate(bullets):
+            if min(speeds) < bullet.speed:
+                del bullets[x]
+                wait = True
+                continue
             if bullet.direction == 0:
                 bullet.rectangle.x += bullet.speed
             elif bullet.direction == 1:
@@ -78,11 +87,13 @@ def main():
                 bullet.rectangle.y -= bullet.speed
             elif bullet.direction == 3:
                 bullet.rectangle.x -= bullet.speed
+        return wait
 
     def spawn_bullets():
-        position = random.choice(spawn_locations)
-        spawn_side = spawn_locations.index(position)
-        bullets.append(Bullet(rectangle=pygame.Rect(position[0], position[1], 8, 8), direction=spawn_side))
+        if not waiting:
+            position = random.choice(spawn_locations)
+            spawn_side = spawn_locations.index(position)
+            bullets.append(Bullet(rectangle=pygame.Rect(position[0], position[1], 8, 8), direction=spawn_side))
 
     def check_collisions(game_score, game_health):
         for x, bullet in enumerate(bullets):
@@ -118,6 +129,8 @@ def main():
             for bullet in bullets:
                 pygame.draw.rect(screen, (0, 0, 255), bullet.rectangle)
         else:
+            pygame.mixer.music.load("Assets/game_over.wav")
+            pygame.mixer.music.play()
             font = pygame.font.SysFont("", 80)
             end_text0 = font.render(f"Game Over!", True, (0, 0, 0))
             font = pygame.font.SysFont("", 64)
@@ -129,7 +142,7 @@ def main():
     # Game loop
     while True:
         if not game_over:
-            delay, bullet_speed = adjust_difficulty()
+            delay, bullet_speed = adjust_difficulty(delay)
             # Reset or increment counter
             if delay_counter >= delay:
                 delay_counter = 0
@@ -142,7 +155,7 @@ def main():
                 if event.type == pygame.KEYDOWN:
                     handle_turning(event.key)
             # Calculate things
-            move_bullets()
+            waiting = move_bullets()
             if delay_counter >= delay:
                 spawn_bullets()
             score, health = check_collisions(score, health)

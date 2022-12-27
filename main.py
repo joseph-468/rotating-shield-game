@@ -18,7 +18,7 @@ def main():
     clock = pygame.time.Clock()
 
     # Variables
-    font = pygame.font.SysFont("", 48)
+    game_over = False
     bullet_speed = 4
     spawn_locations = [(0, 395), (395, 0), (395, 792), (792, 395)]
     counter = 0
@@ -79,46 +79,70 @@ def main():
                 game_health -= 1
         return game_score, game_health
 
-    def render_game():
+    def game_over_check(game_health):
+        if game_health > 0:
+            return False
+        return True
+
+    def render_game(ended):
         screen.fill(WHITE)
-        # Text
-        score_text = font.render(f"Score: {score}", True, (0, 0, 0))
-        health_text = font.render(f"Lives: {health}", True, (0, 0, 0))
-        screen.blit(score_text, (20, 20))
-        screen.blit(health_text, (20, 68))
-        # Objects
-        pygame.draw.rect(screen, (0, 0, 0), hit_box, 2)
-        pygame.draw.rect(screen, (255, 0, 0), player)
-        for bullet in bullets:
-            pygame.draw.rect(screen, (0, 0, 255), bullet.rectangle)
+        font = pygame.font.SysFont("", 48)
+        if not ended:
+            # Text
+            score_text = font.render(f"Score: {score}", True, (0, 0, 0))
+            health_text = font.render(f"Lives: {health}", True, (0, 0, 0))
+            screen.blit(score_text, (20, 20))
+            screen.blit(health_text, (20, 68))
+            # Objects
+            pygame.draw.rect(screen, (0, 0, 0), hit_box, 2)
+            pygame.draw.rect(screen, (255, 0, 0), player)
+            for bullet in bullets:
+                pygame.draw.rect(screen, (0, 0, 255), bullet.rectangle)
+        else:
+            font = pygame.font.SysFont("", 80)
+            end_text0 = font.render(f"Game Over!", True, (0, 0, 0))
+            font = pygame.font.SysFont("", 64)
+            end_text1 = font.render(f"You scored: {score}", True, (0, 0, 0))
+            screen.blit(end_text0, (240, 256))
+            screen.blit(end_text1, (260, 364))
         pygame.display.update()
 
     # Game loop
     while True:
-        if counter == 30:
-            counter = 0
-        else:
-            counter += 1
-        # Gets input
-        for event in pygame.event.get():
-            # Handle quitting
-            if event.type == pygame.QUIT:
-                pygame.quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
+        if not game_over:
+            if counter == 30:
+                counter = 0
+            else:
+                counter += 1
+            # Gets input
+            for event in pygame.event.get():
+                # Handle quitting
+                if event.type == pygame.QUIT:
                     pygame.quit()
-                # Handle input
-                move(event.key)
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
+                    # Handle input
+                    move(event.key)
 
-        # Calculate things
-        move_bullets()
-        if counter == 30:
-            spawn_bullets()
-        score, health = check_collisions(score, health)
-
-        # Update screen
-        render_game()
-        clock.tick(FPS)
+            # Calculate things
+            move_bullets()
+            if counter == 30:
+                spawn_bullets()
+            score, health = check_collisions(score, health)
+            game_over = game_over_check(health)
+            # Update screen
+            render_game(game_over)
+            clock.tick(FPS)
+        else:
+            # Gets input
+            for event in pygame.event.get():
+                # Handle quitting
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_ESCAPE:
+                        pygame.quit()
 
 
 if __name__ == "__main__":

@@ -2,6 +2,7 @@
 
 # How to play 
 Install pygame with "pip install pygame" or through the requirements.txt file \
+Download the zip file, extract and then run main.py \
 Use WASD to rotate and catch the bullets
 
 # About

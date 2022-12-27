@@ -1,11 +1,5 @@
 import random
-
 import pygame
-
-# CONSTANTS
-WIDTH, HEIGHT = 800, 800
-FPS = 60
-WHITE = (255, 255, 255)
 
 
 def main():
@@ -14,7 +8,7 @@ def main():
     pygame.mixer.init()
     pygame.font.init()
     pygame.display.set_caption("Game")
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen = pygame.display.set_mode((800, 800))
     clock = pygame.time.Clock()
 
     # Variables
@@ -35,7 +29,16 @@ def main():
             self.direction = direction
 
     # Functions
-    def move(key):
+    def handle_quitting(pygame_event):
+        if pygame_event.type == pygame.QUIT:
+            pygame.quit()
+            exit()
+        if pygame_event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                pygame.quit()
+                exit()
+
+    def handle_turning(key):
         if key == pygame.K_w:
             player.size = (32, 8)
             player.x = 383
@@ -85,7 +88,7 @@ def main():
         return True
 
     def render_game(ended):
-        screen.fill(WHITE)
+        screen.fill((255, 255, 255))
         font = pygame.font.SysFont("", 48)
         if not ended:
             # Text
@@ -110,21 +113,16 @@ def main():
     # Game loop
     while True:
         if not game_over:
+            # Reset or increment counter
             if counter == 30:
                 counter = 0
             else:
                 counter += 1
             # Gets input
             for event in pygame.event.get():
-                # Handle quitting
-                if event.type == pygame.QUIT:
-                    pygame.quit()
+                handle_quitting(event)
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        pygame.quit()
-                    # Handle input
-                    move(event.key)
-
+                    handle_turning(event.key)
             # Calculate things
             move_bullets()
             if counter == 30:
@@ -133,16 +131,11 @@ def main():
             game_over = game_over_check(health)
             # Update screen
             render_game(game_over)
-            clock.tick(FPS)
+            clock.tick(60)  # Frame rate
         else:
-            # Gets input
+            # Handle quitting
             for event in pygame.event.get():
-                # Handle quitting
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_ESCAPE:
-                        pygame.quit()
+                handle_quitting(event)
 
 
 if __name__ == "__main__":

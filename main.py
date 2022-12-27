@@ -28,7 +28,7 @@ def main():
     delay_counter = 0
     counter = 0
     score = 0
-    health = 5
+    health = 0
     bullets = []
 
     # Classes
@@ -133,6 +133,12 @@ def main():
             pygame.display.update()
             return True
         else:
+            # Read and write scores
+            with open("scores.txt", "a") as file:
+                file.write(f"{score}:")
+            with open("scores.txt", "r") as file:
+                scores = file.read().split(":")
+                highscore = max(scores)
             # Play game over sound
             pygame.mixer.music.load("Assets/game_over.wav")
             pygame.mixer.music.play()
@@ -140,19 +146,21 @@ def main():
             while main_menu:
                 screen.fill((255, 255, 255))
                 # Render text
-                font = pygame.font.SysFont("", 80)
+                font = pygame.font.SysFont("", 96)
                 end_text0 = font.render(f"Game Over!", True, (0, 0, 0))
                 font = pygame.font.SysFont("", 64)
                 end_text1 = font.render(f"You scored: {score}", True, (0, 0, 0))
-                end_text2 = font.render(f"Restart", True, (0, 0, 0))
+                end_text2 = font.render(f"Highscore: {highscore}", True, (0, 0, 0))
+                end_text3 = font.render(f"Restart", True, (0, 0, 0))
                 if pygame.Rect(310, 453, 200, 64).collidepoint(pygame.mouse.get_pos()):
                     restart_button_color = (40, 160, 40)
                 else:
                     restart_button_color = (32, 128, 32)
                 pygame.draw.rect(screen, restart_button_color, pygame.Rect(310, 453, 200, 64))
-                screen.blit(end_text0, (240, 256))
-                screen.blit(end_text1, (260, 364))
-                screen.blit(end_text2, (330, 464))
+                screen.blit(end_text0, (210, 240))
+                screen.blit(end_text1, (260, 320))
+                screen.blit(end_text2, (270, 380))
+                screen.blit(end_text3, (330, 464))
                 # Handle quitting
                 for key in pygame.event.get():
                     if key.type == pygame.MOUSEBUTTONDOWN and restart_button_color == (40, 160, 40):

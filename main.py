@@ -1,5 +1,7 @@
-import random
 import pygame
+import random
+
+FPS = 120  # Max is 240, Min is 20
 
 
 def main():
@@ -12,9 +14,13 @@ def main():
     clock = pygame.time.Clock()
 
     # Variables
+    ten_second = FPS * 10
+    frame_interval = 240 // FPS
+    delay_interval = FPS / 60
     game_over = False
     bullet_speed = 4
     spawn_locations = [(0, 395), (395, 0), (395, 792), (792, 395)]
+    delay_counter = 0
     counter = 0
     score = 0
     health = 5
@@ -27,6 +33,7 @@ def main():
         def __init__(self, rectangle, direction):
             self.rectangle = rectangle
             self.direction = direction
+            self.speed = bullet_speed
 
     # Functions
     def handle_quitting(pygame_event):
@@ -37,6 +44,11 @@ def main():
             if event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
+
+    def adjust_difficulty():
+        frame_delay = FPS - counter // FPS * delay_interval
+        pixel_per_frame = frame_interval + counter // ten_second
+        return frame_delay, pixel_per_frame
 
     def handle_turning(key):
         if key == pygame.K_w:
@@ -59,13 +71,13 @@ def main():
     def move_bullets():
         for bullet in bullets:
             if bullet.direction == 0:
-                bullet.rectangle.x += bullet_speed
+                bullet.rectangle.x += bullet.speed
             elif bullet.direction == 1:
-                bullet.rectangle.y += bullet_speed
+                bullet.rectangle.y += bullet.speed
             elif bullet.direction == 2:
-                bullet.rectangle.y -= bullet_speed
+                bullet.rectangle.y -= bullet.speed
             elif bullet.direction == 3:
-                bullet.rectangle.x -= bullet_speed
+                bullet.rectangle.x -= bullet.speed
 
     def spawn_bullets():
         position = random.choice(spawn_locations)
@@ -117,10 +129,12 @@ def main():
     # Game loop
     while True:
         if not game_over:
+            delay, bullet_speed = adjust_difficulty()
             # Reset or increment counter
-            if counter == 30:
-                counter = 0
+            if delay_counter >= delay:
+                delay_counter = 0
             else:
+                delay_counter += 1
                 counter += 1
             # Gets input
             for event in pygame.event.get():
@@ -129,13 +143,13 @@ def main():
                     handle_turning(event.key)
             # Calculate things
             move_bullets()
-            if counter == 30:
+            if delay_counter >= delay:
                 spawn_bullets()
             score, health = check_collisions(score, health)
             game_over = game_over_check(health)
             # Update screen
             render_game(game_over)
-            clock.tick(60)  # Frame rate
+            clock.tick(FPS)  # Frame rate
         else:
             # Handle quitting
             for event in pygame.event.get():

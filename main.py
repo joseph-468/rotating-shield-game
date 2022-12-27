@@ -77,9 +77,13 @@ def main():
             if player.colliderect(bullet.rectangle):
                 del bullets[x]
                 game_score += 1
+                pygame.mixer.music.load("Assets/block.wav")
+                pygame.mixer.music.play()
             elif hit_box.colliderect(bullet.rectangle):
                 del bullets[x]
                 game_health -= 1
+                pygame.mixer.music.load("Assets/hit.wav")
+                pygame.mixer.music.play()
         return game_score, game_health
 
     def game_over_check(game_health):

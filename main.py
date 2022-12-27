@@ -13,20 +13,22 @@ def main():
     screen = pygame.display.set_mode((800, 800))
     clock = pygame.time.Clock()
 
-    # Variables
-    waiting = False
+    # Constants
+    hit_box = pygame.Rect(383, 383, 32, 32)
     fifteen_seconds = FPS * 15
     frame_interval = 240 // FPS
     delay = FPS
     max_speed = frame_interval*4
-    game_over = False
     spawn_locations = [(-8, 395), (395, -8), (395, 800), (800, 395)]
+
+    # Variables
+    player = pygame.Rect(383, 383, 32, 8)
+    waiting = False
+    running = True
     delay_counter = 0
     counter = 0
     score = 0
     health = 5
-    player = pygame.Rect(383, 383, 32, 8)
-    hit_box = pygame.Rect(383, 383, 32, 32)
     bullets = []
 
     # Classes
@@ -42,7 +44,7 @@ def main():
             pygame.quit()
             exit()
         if pygame_event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
+            if pygame_event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 exit()
 
@@ -128,20 +130,39 @@ def main():
             pygame.draw.rect(screen, (255, 0, 0), player)
             for bullet in bullets:
                 pygame.draw.rect(screen, (0, 0, 255), bullet.rectangle)
+            pygame.display.update()
+            return True
         else:
+            # Play game over sound
             pygame.mixer.music.load("Assets/game_over.wav")
             pygame.mixer.music.play()
-            font = pygame.font.SysFont("", 80)
-            end_text0 = font.render(f"Game Over!", True, (0, 0, 0))
-            font = pygame.font.SysFont("", 64)
-            end_text1 = font.render(f"You scored: {score}", True, (0, 0, 0))
-            screen.blit(end_text0, (240, 256))
-            screen.blit(end_text1, (260, 364))
-        pygame.display.update()
+            main_menu = True
+            while main_menu:
+                screen.fill((255, 255, 255))
+                # Render text
+                font = pygame.font.SysFont("", 80)
+                end_text0 = font.render(f"Game Over!", True, (0, 0, 0))
+                font = pygame.font.SysFont("", 64)
+                end_text1 = font.render(f"You scored: {score}", True, (0, 0, 0))
+                end_text2 = font.render(f"Restart", True, (0, 0, 0))
+                if pygame.Rect(310, 453, 200, 64).collidepoint(pygame.mouse.get_pos()):
+                    restart_button_color = (40, 160, 40)
+                else:
+                    restart_button_color = (32, 128, 32)
+                pygame.draw.rect(screen, restart_button_color, pygame.Rect(310, 453, 200, 64))
+                screen.blit(end_text0, (240, 256))
+                screen.blit(end_text1, (260, 364))
+                screen.blit(end_text2, (330, 464))
+                # Handle quitting
+                for key in pygame.event.get():
+                    if key.type == pygame.MOUSEBUTTONDOWN and restart_button_color == (40, 160, 40):
+                        return False
+                    handle_quitting(key)
+                pygame.display.update()
 
-    # Game loop
     while True:
-        if not game_over:
+        # Game loop
+        while running:
             delay, bullet_speed = adjust_difficulty(delay)
             # Reset or increment counter
             if delay_counter >= delay:
@@ -161,12 +182,18 @@ def main():
             score, health = check_collisions(score, health)
             game_over = game_over_check(health)
             # Update screen
-            render_game(game_over)
+            running = render_game(game_over)
             clock.tick(FPS)  # Frame rate
-        else:
-            # Handle quitting
-            for event in pygame.event.get():
-                handle_quitting(event)
+
+        # Variables
+        player = pygame.Rect(383, 383, 32, 8)
+        waiting = False
+        running = True
+        delay_counter = 0
+        counter = 0
+        score = 0
+        health = 5
+        bullets = []
 
 
 if __name__ == "__main__":

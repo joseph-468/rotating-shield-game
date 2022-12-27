@@ -59,19 +59,19 @@ def main():
         return frame_delay, pixel_per_frame
 
     def handle_turning(key):
-        if key == pygame.K_w:
+        if key == pygame.K_UP or key == pygame.K_w:
             player.size = (32, 8)
             player.x = 383
             player.y = 383
-        if key == pygame.K_s:
+        if key == pygame.K_DOWN or key == pygame.K_s:
             player.size = (32, 8)
             player.x = 383
             player.y = 407
-        if key == pygame.K_a:
+        if key == pygame.K_LEFT or key == pygame.K_a:
             player.size = (8, 32)
             player.x = 383
             player.y = 383
-        if key == pygame.K_d:
+        if key == pygame.K_RIGHT or key == pygame.K_d:
             player.size = (8, 32)
             player.x = 407
             player.y = 383

@@ -3,7 +3,7 @@
 # How to play 
 Install pygame with "pip install pygame" or through the requirements.txt file \
 Download the zip file, extract and then run main.py \
-Use WASD to rotate and catch the bullets \
+Use arrow keys or WASD to rotate your shield to catch the bullets \
 If you have any performance issues go into options and lower the FPS
 
 # About

@@ -31,7 +31,7 @@ def main():
     delay_counter = 0
     counter = 0
     score = 0
-    health = 0
+    health = 5
     bullets = []
 
     # Classes

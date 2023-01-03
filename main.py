@@ -32,7 +32,7 @@ def main():
     delay_counter = 0
     counter = 0
     score = 0
-    health = 5
+    health = 1
     bullets = []
 
     # Classes
@@ -141,8 +141,9 @@ def main():
             with open("scores.txt", "a") as file:
                 file.write(f"{score}:")
             with open("scores.txt", "r") as file:
-                scores = file.read().split(":")
-                highscore = max(scores)
+                scores = file.read().split(":")[:-1]
+                scores = [int(i) for i in scores]
+                highscore = str(max(scores))
             # Play game over sound
             pygame.mixer.music.load("Assets/game_over.wav")
             pygame.mixer.music.play()

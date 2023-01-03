@@ -1,5 +1,6 @@
 import pygame
 import random
+import sys
 
 # Options
 with open("options.txt", "r") as config:
@@ -45,11 +46,11 @@ def main():
     def handle_quitting(pygame_event):
         if pygame_event.type == pygame.QUIT:
             pygame.quit()
-            exit()
+            sys.exit()
         if pygame_event.type == pygame.KEYDOWN:
             if pygame_event.key == pygame.K_ESCAPE:
                 pygame.quit()
-                exit()
+                sys.exit()
 
     def adjust_difficulty(new_delay):
         frame_delay = new_delay - (new_delay*frame_interval/8000)

@@ -202,6 +202,7 @@ def main():
         player = pygame.Rect(383, 383, 32, 8)
         waiting = False
         running = True
+        delay = FPS
         delay_counter = 0
         counter = 0
         score = 0
